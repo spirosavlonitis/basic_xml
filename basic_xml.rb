@@ -13,7 +13,16 @@ class BasicXml < BasicObject
 		elsif args[0].is_a? ::String and block
 			::Object.send(:raise, ::ArgumentError, "cannot mix a text argument with a block")
 		else
-			@target.puts "#{' ' * @cur_indent}<#{tag}>#{args[0]}</#{tag}>"
+			if args[0].is_a? ::String and args.size == 1
+				@target.puts "#{' ' * @cur_indent}<#{tag}>#{args[0]}</#{tag}>"
+			elsif args[0].is_a? ::String
+				@target.print "#{' ' * @cur_indent}<#{tag} "
+				args[1].each do |attrb, value| 
+					@target.print %Q[#{attrb}="#{value}"#{' ' unless attrb == args[1].keys.last}]
+				end
+
+				@target.puts ">#{args[0]}</#{tag}>"
+			end
 		end
 
 		if block
@@ -28,6 +37,8 @@ end
 
 xml = BasicXml.new indent: 2, target: STDOUT
 
+
+xml.foo "Matz", language: "Ruby", year: 1992
 
 xml.foo {
 	xml.bar {
