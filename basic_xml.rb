@@ -20,7 +20,7 @@ class BasicXml < BasicObject
 		 		args[1].each { |attrb, value| @target.print %Q[ #{attrb}="#{value}"] } 
 		 	end
 			@target.puts ">#{args[0]}</#{tag}>"
-		else											# only attributes
+		else										# only attributes
 			@target.print "#{' ' * @cur_indent}<#{tag}"
 			args[0].each { |attrb, value| @target.print %Q[ #{attrb}="#{value}"] }
 			@target.puts  block ? ">" : "/>"
