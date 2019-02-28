@@ -12,30 +12,26 @@ class BasicXml < BasicObject
 			@target.puts "#{' ' * @cur_indent}<#{block ? '' : '/' }#{tag}>"
 		elsif args[0].is_a? ::String and block		# malformed xml tag
 			::Object.send(:raise, ::ArgumentError, "Cannot mix a text argument with a block")
-		else				# check if tag content, attribute or both are given
-			if args[0].is_a? ::String
-				if args.size == 1
-					@target.puts "#{' ' * @cur_indent}<#{tag}>#{args[0]}</#{tag}>"
-				else
-					@target.print "#{' ' * @cur_indent}<#{tag} "
-					args[1].each do |attrb, value| 
+		elsif args[0].is_a? ::String  # tag content with or without attributes
+				@target.print "#{' ' * @cur_indent}<#{tag} "
+				if args.size == 2	  # with attributes
+					args[1].each do |attrb, value|
 						@target.print %Q[#{attrb}="#{value}"#{' ' unless attrb == args[1].keys.last}]
 					end
-					@target.puts ">#{args[0]}</#{tag}>"
 				end
-			else
-				@target.print "#{' ' * @cur_indent}<#{tag} "
-				args[0].each do |attrb, value| 
-					@target.print %Q[#{attrb}="#{value}"#{' ' unless attrb == args[0].keys.last}]
-				end
-				@target.puts  block ? ">" : "/>"
+				@target.puts ">#{args[0]}</#{tag}>"
+		else
+			@target.print "#{' ' * @cur_indent}<#{tag} "
+			args[0].each do |attrb, value| 
+				@target.print %Q[#{attrb}="#{value}"#{' ' unless attrb == args[0].keys.last}]
 			end
+			@target.puts  block ? ">" : "/>"
 		end
 
-		if block				# add indent when called with a block
-			@cur_indent += @indent
-			block.call()
-			@cur_indent -= @indent
+		if block				
+			@cur_indent += @indent 			# add indentation before calling the block
+			block.call
+			@cur_indent -= @indent 			# remove indentation after call to block
 			@target.puts "#{' ' * @cur_indent}</#{tag}>"
 		end
 	end
